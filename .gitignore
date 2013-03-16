@@ -1,0 +1,7 @@
+*.class
+*.war
+.project
+.classpath
+.settings
+target/
+bin/

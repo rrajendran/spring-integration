@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail-2.2.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.2.xsd
+		http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file-2.2.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-2.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	<context:annotation-config />
+	<context:component-scan base-package=" com.capella.spring.integration" />
+
+	<int:channel id="inputChannel" />
+	<int:channel id="outputChannel">
+		<int:queue capacity="10"/>
+	</int:channel> 
+	<int:service-activator  input-channel="inputChannel" output-channel="outputChannel" ref="helloworld" method="sayHello"/>
+	
+	<bean id="helloworld" class="com.capella.spring.integration.helloworld.HelloWorldMessage" />
+	
+	<!-- File demo -->
+	<int-file:inbound-channel-adapter id="fileInChannel" directory="/tmp" filename-pattern="*.txt">
+		<int:poller id="poller" fixed-delay="5000" />
+	</int-file:inbound-channel-adapter>
+	
+	<int-file:outbound-channel-adapter id="fileOutChannel" directory="/tmp/p" delete-source-files="true" />
+	
+	<int:service-activator input-channel="fileInChannel" output-channel="fileOutChannel" ref="fileHandler" />
+</beans>
